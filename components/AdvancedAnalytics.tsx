@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { PORTFOLIO_CONFIG } from '@/lib/config';
 import { DollarSign, TrendingUp, Calendar, Target, Percent, AlertCircle } from 'lucide-react';
 
-const SHARES = 9876;
-const PURCHASE_PRICE = 4.05;
-const PURCHASE_DATE = '2025-07-30'; // July 30, 2025
+const SHARES = PORTFOLIO_CONFIG.SHARES;
+const PURCHASE_PRICE = PORTFOLIO_CONFIG.PURCHASE_PRICE;
+const PURCHASE_DATE = PORTFOLIO_CONFIG.PURCHASE_DATE;
 
 export default function AdvancedAnalytics() {
   const [stockData, setStockData] = useState<any>(null);
@@ -52,10 +53,10 @@ export default function AdvancedAnalytics() {
   const totalGain = currentValue - totalInvestment;
   const percentGain = (totalGain / totalInvestment) * 100;
   
-  // Calculate actual days since purchase (July 30, 2024)
+  // Calculate actual days since purchase
   const purchaseDate = new Date(PURCHASE_DATE);
   const today = new Date();
-  const daysSincePurchase = Math.floor((today.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysSincePurchase = Math.max(1, Math.floor((today.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24)));
   
   // Calculate realistic annualized return based on actual performance
   const yearsHeld = daysSincePurchase / 365;
@@ -151,9 +152,9 @@ export default function AdvancedAnalytics() {
             </p>
           </div>
           <div className="bg-gray-800/50 rounded-lg p-4">
-            <p className="text-xs text-gray-400 mb-1">52 Week Range</p>
-            <p className="text-sm font-medium text-white">
-              ${stockData?.week52Low?.toFixed(2) || '3.36'} - ${stockData?.week52High?.toFixed(2) || '11.20'}
+            <p className="text-xs text-gray-400 mb-1">Market Cap</p>
+            <p className="text-xl font-bold text-white">
+              ${stockData?.marketCap ? (stockData.marketCap / 1000000000).toFixed(2) : '0.00'}B
             </p>
           </div>
         </div>

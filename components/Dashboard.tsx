@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { PORTFOLIO_CONFIG } from '@/lib/config';
 import { 
   TrendingUp, TrendingDown, DollarSign, Activity, 
   BarChart3, Clock, AlertCircle, Target, Zap, 
@@ -33,8 +34,8 @@ interface StockData {
   nextUpdate: number;
 }
 
-const SHARES = 9876;
-const COST_BASIS = 4.05;
+const SHARES = PORTFOLIO_CONFIG.SHARES;
+const COST_BASIS = PORTFOLIO_CONFIG.PURCHASE_PRICE;
 
 export default function Dashboard() {
   const [stockData, setStockData] = useState<StockData | null>(null);
@@ -237,7 +238,7 @@ export default function Dashboard() {
               <StatRow label="Bid" value={`${formatCurrency(stockData?.bid || 0)} x ${stockData?.bidSize || 0}`} color="text-red-400" />
               <StatRow label="Ask" value={`${formatCurrency(stockData?.ask || 0)} x ${stockData?.askSize || 0}`} color="text-green-400" />
               <StatRow label="Spread" value={formatCurrency((stockData?.ask || 0) - (stockData?.bid || 0))} />
-              <StatRow label="Market Cap" value={`$${((stockData?.marketCap || 0) / 1000000).toFixed(0)}M`} />
+              <StatRow label="Market Cap" value={stockData?.marketCap ? `$${(stockData.marketCap / 1000000000).toFixed(2)}B` : 'N/A'} />
               <StatRow label="P/E Ratio" value={stockData?.pe ? stockData.pe.toFixed(2) : 'N/A'} />
             </div>
           </div>

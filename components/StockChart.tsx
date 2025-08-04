@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { PORTFOLIO_CONFIG } from '@/lib/config';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { Calendar, TrendingUp, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
-const PURCHASE_DATE = '2025-07-30';
-const PURCHASE_PRICE = 4.05;
-const SHARES = 9876;
+const PURCHASE_DATE = PORTFOLIO_CONFIG.PURCHASE_DATE;
+const PURCHASE_PRICE = PORTFOLIO_CONFIG.PURCHASE_PRICE;
+const SHARES = PORTFOLIO_CONFIG.SHARES;
 
 export default function StockChart() {
   const [chartData, setChartData] = useState<any[]>([]);
