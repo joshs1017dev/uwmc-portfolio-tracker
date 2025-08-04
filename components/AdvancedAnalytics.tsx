@@ -307,7 +307,7 @@ export default function AdvancedAnalytics() {
             <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-gray-300">
               <p className="font-medium text-yellow-400 mb-1">Investment Disclaimer</p>
-              <p>These projections use conservative estimates (8-20% annual returns). Actual results will vary based on market conditions. Past performance does not guarantee future results. UWMC is a mortgage REIT with inherent volatility.</p>
+              <p>These projections use conservative estimates (8-20% annual returns). Actual results will vary based on market conditions. Past performance does not guarantee future results. UWMC is a mortgage company with inherent volatility.</p>
             </div>
           </div>
         </div>
