@@ -2,7 +2,7 @@
 export const PORTFOLIO_CONFIG = {
   SHARES: parseInt(process.env.NEXT_PUBLIC_SHARES || '9876'),
   PURCHASE_PRICE: parseFloat(process.env.NEXT_PUBLIC_PURCHASE_PRICE || '4.05'),
-  PURCHASE_DATE: process.env.NEXT_PUBLIC_PURCHASE_DATE || '2024-07-30',
+  PURCHASE_DATE: process.env.NEXT_PUBLIC_PURCHASE_DATE || '2025-07-30',
   SYMBOL: 'UWMC'
 };
 
