@@ -5,7 +5,7 @@ import { DollarSign, TrendingUp, Calendar, Target, Percent, AlertCircle } from '
 
 const SHARES = 9876;
 const PURCHASE_PRICE = 4.05;
-const PURCHASE_DATE = '2024-07-30'; // July 30, 2024
+const PURCHASE_DATE = '2025-07-30'; // July 30, 2025
 
 export default function AdvancedAnalytics() {
   const [stockData, setStockData] = useState<any>(null);

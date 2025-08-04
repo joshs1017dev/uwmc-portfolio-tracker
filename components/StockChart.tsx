@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Calendar, TrendingUp, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
-const PURCHASE_DATE = '2024-07-30';
+const PURCHASE_DATE = '2025-07-30';
 const PURCHASE_PRICE = 4.05;
 const SHARES = 9876;
 
