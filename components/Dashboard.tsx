@@ -68,7 +68,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 5000); // Update every 5 seconds
+    const interval = setInterval(fetchData, 15000); // Update every 15 seconds (to avoid API rate limits)
 
     return () => clearInterval(interval);
   }, []);

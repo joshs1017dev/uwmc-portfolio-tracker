@@ -5,7 +5,7 @@ import { DollarSign, TrendingUp, Calendar, Target, Percent, AlertCircle } from '
 
 const SHARES = 9876;
 const PURCHASE_PRICE = 4.05;
-const PURCHASE_DATE = '2024-07-30';
+const PURCHASE_DATE = '2025-07-30';
 
 export default function AdvancedAnalytics() {
   const currentPrice = 5.25; // This would come from API in real app
