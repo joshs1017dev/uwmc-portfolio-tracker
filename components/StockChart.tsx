@@ -12,38 +12,64 @@ const SHARES = 9876;
 export default function StockChart() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState('1M');
+  const [stockData, setStockData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Generate chart data since purchase date
+    // Fetch real-time stock data
+    const fetchStockData = async () => {
+      try {
+        const response = await fetch('/api/stock?symbol=UWMC');
+        const data = await response.json();
+        setStockData(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching stock data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchStockData();
+    const interval = setInterval(fetchStockData, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    // Generate chart data with real current price
     const generateChartData = () => {
       const data = [];
       const startDate = new Date(PURCHASE_DATE);
       const today = new Date();
       const daysSincePurchase = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
       
-      // Generate realistic price movement
-      let basePrice = PURCHASE_PRICE;
+      // Use real current price or fallback
+      const currentPrice = stockData?.price || 4.95;
+      
+      // Calculate price progression from purchase to current
+      const priceChange = currentPrice - PURCHASE_PRICE;
+      const dailyChange = priceChange / daysSincePurchase;
       
       for (let i = 0; i <= daysSincePurchase; i++) {
         const date = new Date(startDate);
         date.setDate(date.getDate() + i);
         
-        // Add some realistic volatility
-        const trend = 0.001; // Slight upward trend
+        // Create a more realistic price progression with some volatility
+        const trendPrice = PURCHASE_PRICE + (dailyChange * i);
         const volatility = 0.02; // 2% daily volatility
         const randomChange = (Math.random() - 0.5) * volatility;
+        const dayPrice = trendPrice * (1 + randomChange);
         
-        basePrice = basePrice * (1 + trend + randomChange);
-        basePrice = Math.max(3.5, Math.min(6.5, basePrice)); // Keep within realistic range
+        // Ensure we end at the actual current price
+        const finalPrice = i === daysSincePurchase ? currentPrice : dayPrice;
         
-        const value = basePrice * SHARES;
+        const value = finalPrice * SHARES;
         const gain = value - (PURCHASE_PRICE * SHARES);
         const gainPercent = (gain / (PURCHASE_PRICE * SHARES)) * 100;
         
         data.push({
           date: format(date, 'MMM dd'),
           fullDate: date.toISOString(),
-          price: Number(basePrice.toFixed(2)),
+          price: Number(finalPrice.toFixed(2)),
           value: Number(value.toFixed(2)),
           gain: Number(gain.toFixed(2)),
           gainPercent: Number(gainPercent.toFixed(2)),
@@ -63,8 +89,10 @@ export default function StockChart() {
       setChartData(filteredData);
     };
 
-    generateChartData();
-  }, [timeRange]);
+    if (stockData) {
+      generateChartData();
+    }
+  }, [timeRange, stockData]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -101,6 +129,23 @@ export default function StockChart() {
   };
 
   const latestData = chartData[chartData.length - 1];
+  const currentValue = stockData ? stockData.price * SHARES : 0;
+  const totalGain = currentValue - (PURCHASE_PRICE * SHARES);
+  const gainPercent = (totalGain / (PURCHASE_PRICE * SHARES)) * 100;
+  const daysSincePurchase = Math.floor((new Date().getTime() - new Date(PURCHASE_DATE).getTime()) / (1000 * 60 * 60 * 24));
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-800 rounded w-1/4 mb-6"></div>
+            <div className="h-96 bg-gray-800 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -139,33 +184,31 @@ export default function StockChart() {
           </div>
         </div>
 
-        {/* Summary Stats */}
-        {latestData && (
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="bg-gray-800/50 rounded-lg p-4">
-              <p className="text-xs text-gray-400 mb-1">Current Value</p>
-              <p className="text-xl font-bold text-white">{formatCurrency(latestData.value)}</p>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-4">
-              <p className="text-xs text-gray-400 mb-1">Total Gain/Loss</p>
-              <p className={`text-xl font-bold ${latestData.gain >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {formatCurrency(latestData.gain)}
-              </p>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-4">
-              <p className="text-xs text-gray-400 mb-1">Percentage Change</p>
-              <p className={`text-xl font-bold ${latestData.gainPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {latestData.gainPercent >= 0 ? '+' : ''}{latestData.gainPercent.toFixed(2)}%
-              </p>
-            </div>
-            <div className="bg-gray-800/50 rounded-lg p-4">
-              <p className="text-xs text-gray-400 mb-1">Days Held</p>
-              <p className="text-xl font-bold text-white">
-                {Math.floor((new Date().getTime() - new Date(PURCHASE_DATE).getTime()) / (1000 * 60 * 60 * 24))}
-              </p>
-            </div>
+        {/* Summary Stats - Using Real-Time Data */}
+        <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs text-gray-400 mb-1">Current Value</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(currentValue)}</p>
           </div>
-        )}
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs text-gray-400 mb-1">Total Gain/Loss</p>
+            <p className={`text-xl font-bold ${totalGain >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {formatCurrency(totalGain)}
+            </p>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs text-gray-400 mb-1">Percentage Change</p>
+            <p className={`text-xl font-bold ${gainPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {gainPercent >= 0 ? '+' : ''}{gainPercent.toFixed(2)}%
+            </p>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            <p className="text-xs text-gray-400 mb-1">Days Held</p>
+            <p className="text-xl font-bold text-white">
+              {daysSincePurchase}
+            </p>
+          </div>
+        </div>
 
         {/* Chart */}
         <div className="h-96">
