@@ -18,3 +18,51 @@ export const UWMC_ACTUAL_DATA = {
 export function calculateMarketCap(price: number): number {
   return price * UWMC_ACTUAL_DATA.SHARES_OUTSTANDING;
 }
+
+// RSU Vesting Schedule Configuration
+export interface VestingEvent {
+  date: string;
+  shares: number;
+  grantId: string;
+  grantDate: string;
+  grantPrice: number;
+}
+
+export const RSU_VESTING_SCHEDULE: VestingEvent[] = [
+  {
+    date: '2025-09-15',
+    shares: 2500,
+    grantId: 'RSU-2024-001',
+    grantDate: '2024-09-15',
+    grantPrice: 5.25
+  },
+  {
+    date: '2025-12-15',
+    shares: 2500,
+    grantId: 'RSU-2024-001',
+    grantDate: '2024-09-15',
+    grantPrice: 5.25
+  },
+  {
+    date: '2026-03-15',
+    shares: 2500,
+    grantId: 'RSU-2024-001',
+    grantDate: '2024-09-15',
+    grantPrice: 5.25
+  },
+  {
+    date: '2026-06-15',
+    shares: 2469,
+    grantId: 'RSU-2024-001',
+    grantDate: '2024-09-15',
+    grantPrice: 5.25
+  }
+];
+
+// Tax withholding rates (adjust based on your situation)
+export const TAX_CONFIG = {
+  FEDERAL_RATE: 0.22, // 22% supplemental income rate
+  STATE_RATE: 0.0925, // Example: CA state tax
+  FICA_RATE: 0.0765, // Social Security + Medicare
+  SELL_TO_COVER: true // Whether to sell shares for tax withholding
+};
