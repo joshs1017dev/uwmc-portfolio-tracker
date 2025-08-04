@@ -16,12 +16,23 @@ export default function AdvancedAnalytics() {
   
   // Calculate days since purchase
   const daysSincePurchase = Math.floor((new Date().getTime() - new Date(PURCHASE_DATE).getTime()) / (1000 * 60 * 60 * 24));
-  const dailyGainRate = totalGain / daysSincePurchase;
   
-  // Simple projections
-  const projectedValue30Days = currentValue + (dailyGainRate * 30);
-  const projectedValue90Days = currentValue + (dailyGainRate * 90);
-  const projectedValue1Year = currentValue + (dailyGainRate * 365);
+  // Calculate realistic annualized return based on current performance
+  const dailyReturn = percentGain / daysSincePurchase / 100;
+  const annualizedReturn = Math.min((Math.pow(1 + dailyReturn, 365) - 1) * 100, 30); // Cap at 30% annually
+  
+  // Use conservative projections based on realistic annual returns
+  const conservativeAnnualReturn = 0.08; // 8% annual return
+  const moderateAnnualReturn = 0.12; // 12% annual return
+  const optimisticAnnualReturn = Math.min(annualizedReturn / 100, 0.20); // Current trend or 20% max
+  
+  // Calculate projections using compound interest formula
+  const projectedValue30Days = currentValue * Math.pow(1 + (moderateAnnualReturn / 365), 30);
+  const projectedValue90Days = currentValue * Math.pow(1 + (moderateAnnualReturn / 365), 90);
+  const projectedValue1Year = currentValue * Math.pow(1 + moderateAnnualReturn, 1);
+  
+  // Calculate daily average gain (for display only, not for projections!)
+  const dailyGainDollars = totalGain / Math.max(daysSincePurchase, 1);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -60,27 +71,27 @@ export default function AdvancedAnalytics() {
           <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 border border-purple-500/20 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-3">
               <Calendar className="w-6 h-6 text-purple-400" />
-              <h3 className="text-lg font-semibold text-white">Daily Average</h3>
+              <h3 className="text-lg font-semibold text-white">Performance</h3>
             </div>
-            <p className="text-3xl font-bold text-white mb-2">{formatCurrency(dailyGainRate)}</p>
-            <p className="text-sm text-gray-400">Over {daysSincePurchase} days</p>
+            <p className="text-3xl font-bold text-white mb-2">{annualizedReturn.toFixed(1)}%</p>
+            <p className="text-sm text-gray-400">Annualized return (if trend continues)</p>
           </div>
         </div>
 
-        {/* Simple Projections */}
+        {/* Realistic Projections */}
         <div className="mb-8">
           <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
             <Target className="w-5 h-5 text-yellow-400" />
-            Future Projections
+            Conservative Projections
           </h3>
-          <p className="text-sm text-gray-400 mb-4">Based on your current average daily performance</p>
+          <p className="text-sm text-gray-400 mb-4">Based on 12% annual return (moderate growth scenario)</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-gray-800/50 rounded-lg p-4">
               <p className="text-sm text-gray-400 mb-2">In 30 Days</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(projectedValue30Days)}</p>
               <p className="text-sm text-green-400 mt-1">
-                +{formatCurrency(projectedValue30Days - currentValue)}
+                +{formatCurrency(projectedValue30Days - currentValue)} ({((projectedValue30Days - currentValue) / currentValue * 100).toFixed(1)}%)
               </p>
             </div>
             
@@ -88,7 +99,7 @@ export default function AdvancedAnalytics() {
               <p className="text-sm text-gray-400 mb-2">In 90 Days</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(projectedValue90Days)}</p>
               <p className="text-sm text-green-400 mt-1">
-                +{formatCurrency(projectedValue90Days - currentValue)}
+                +{formatCurrency(projectedValue90Days - currentValue)} ({((projectedValue90Days - currentValue) / currentValue * 100).toFixed(1)}%)
               </p>
             </div>
             
@@ -96,7 +107,43 @@ export default function AdvancedAnalytics() {
               <p className="text-sm text-gray-400 mb-2">In 1 Year</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(projectedValue1Year)}</p>
               <p className="text-sm text-green-400 mt-1">
-                +{formatCurrency(projectedValue1Year - currentValue)}
+                +{formatCurrency(projectedValue1Year - currentValue)} ({((projectedValue1Year - currentValue) / currentValue * 100).toFixed(1)}%)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Different Scenarios */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold text-white mb-4">Projection Scenarios (1 Year)</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Conservative (8% annual)</p>
+                <p className="text-sm text-gray-400">Typical market return</p>
+              </div>
+              <p className="text-xl font-bold text-white">
+                {formatCurrency(currentValue * 1.08)}
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg border border-blue-500/20">
+              <div>
+                <p className="text-white font-medium">Moderate (12% annual)</p>
+                <p className="text-sm text-gray-400">Good growth scenario</p>
+              </div>
+              <p className="text-xl font-bold text-white">
+                {formatCurrency(currentValue * 1.12)}
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
+              <div>
+                <p className="text-white font-medium">Optimistic (20% annual)</p>
+                <p className="text-sm text-gray-400">Best case scenario</p>
+              </div>
+              <p className="text-xl font-bold text-white">
+                {formatCurrency(currentValue * 1.20)}
               </p>
             </div>
           </div>
@@ -147,13 +194,33 @@ export default function AdvancedAnalytics() {
           </div>
         </div>
 
+        {/* Statistics */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-gray-800/50 rounded-lg p-3">
+            <p className="text-xs text-gray-400 mb-1">Days Held</p>
+            <p className="text-lg font-bold text-white">{daysSincePurchase}</p>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-3">
+            <p className="text-xs text-gray-400 mb-1">Avg Daily Gain</p>
+            <p className="text-lg font-bold text-green-400">{formatCurrency(dailyGainDollars)}</p>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-3">
+            <p className="text-xs text-gray-400 mb-1">Total Return</p>
+            <p className="text-lg font-bold text-green-400">{percentGain.toFixed(1)}%</p>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-3">
+            <p className="text-xs text-gray-400 mb-1">Per Share Gain</p>
+            <p className="text-lg font-bold text-green-400">${((currentPrice - PURCHASE_PRICE)).toFixed(2)}</p>
+          </div>
+        </div>
+
         {/* Disclaimer */}
         <div className="mt-8 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
           <div className="flex gap-3">
             <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-gray-300">
               <p className="font-medium text-yellow-400 mb-1">Investment Disclaimer</p>
-              <p>Projections are based on historical performance and do not guarantee future results. Stock prices can be volatile and you may lose money. Always do your own research.</p>
+              <p>These projections use conservative estimates (8-20% annual returns). Actual results will vary based on market conditions. Past performance does not guarantee future results. UWMC is a mortgage REIT with inherent volatility.</p>
             </div>
           </div>
         </div>
